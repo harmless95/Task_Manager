@@ -74,3 +74,15 @@ async def update_by_id_partial(
         partial=True,
     )
     return result_car
+
+
+@router.delete(
+    "/{car_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_by_id(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    car: Car = Depends(get_car_by_id),
+) -> None:
+    await session.delete(car)
+    await session.commit()
