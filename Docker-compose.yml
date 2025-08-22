@@ -1,0 +1,53 @@
+services:
+  ProjectTaskManager:
+    build:
+      dockerfile: DockerBuild/app/Dockerfile
+      context: .
+    working_dir: /ProjectTaskManager
+    environment:
+      APP_CONFIG__DB__URL: postgresql+asyncpg://user:qwe@pg:5432/TaskManager
+    ports:
+      - "5353:8000"
+    depends_on:
+      pg:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./ProjectTaskManager
+          target: /ProjectTaskManager
+        - action: rebuild
+          path: ProjectTaskManager/poetry.lock
+
+  pg:
+    image: postgres
+    environment:
+      POSTGRES_DB: TaskManager
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: qwe
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      pg:
+        condition: service_healthy
+
+volumes:
+  pgdata:
