@@ -37,6 +37,7 @@ class HelperDatabase:
             yield session
             await session.close()
 
+
 db_helper = HelperDatabase(
     url=str(setting.db.url),
     echo=setting.db.echo,
