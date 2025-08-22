@@ -11,6 +11,14 @@ LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(leve
 class ApiV1Prefix(BaseModel):
     prefix: str = "/v1"
 
+    car: str = "/car"
+    brand: str = "/brand"
+    address: str = "/address"
+
+    car_tag: str = "car"
+    brand_tag: str = "brand"
+    address_tag: str = "address"
+
 
 class ApiPrefix(BaseModel):
     prefix: str = "/api"
