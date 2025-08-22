@@ -3,10 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.CRUD.crud_car import get_cars, get_car
+from api.CRUD.crud_car import get_cars, get_car, update_car
 from core.config import setting
 from core.model import db_helper, Car
-from core.schema.schema_car import CarRead
+from core.schema.schema_car import CarRead, CarUpdate
 
 router = APIRouter(
     prefix=setting.api.v1.car,
@@ -37,3 +37,40 @@ async def get_car_by_id(
 ) -> Car:
     car = await get_car(session=session, car_id=car_id)
     return car
+
+
+@router.put(
+    "/{car_id}/",
+    response_model=CarRead,
+    status_code=status.HTTP_200_OK,
+)
+async def update_by_id(
+    data_update: CarUpdate,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    car: Car = Depends(get_car_by_id),
+) -> Car:
+    result_car = await update_car(
+        data_update=data_update,
+        session=session,
+        car=car,
+    )
+    return result_car
+
+
+@router.patch(
+    "/{car_id}/",
+    response_model=CarRead,
+    status_code=status.HTTP_200_OK,
+)
+async def update_by_id_partial(
+    data_update: CarUpdate,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    car: Car = Depends(get_car_by_id),
+) -> Car:
+    result_car = await update_car(
+        data_update=data_update,
+        session=session,
+        car=car,
+        partial=True,
+    )
+    return result_car
