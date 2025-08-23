@@ -1,18 +1,70 @@
 from uuid import UUID
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy import select
 from fastapi import HTTPException, status
 
 from api.CRUD.crud_address import check_address
 from core.model import Car, Brand, Address
-from core.schema.schema_car import CarUpdate
+from core.schema.schema_car import CarUpdate, CarCreate
+
+log = logging.getLogger(__name__)
+
+
+async def create_car(
+    session: AsyncSession,
+    data_car: CarCreate,
+) -> Car:
+    stmt = select(Car).where(Car.name == data_car.name)
+    result = await session.scalars(stmt)
+    car = result.first()
+    if car:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"nvalid such a {data_car.name} already exists",
+        )
+    stmt_brand = select(Brand).where(Brand.name == data_car.brand_id.name)
+    result = await session.scalars(stmt_brand)
+    brand = result.first()
+    if not brand:
+        brand = Brand(name=data_car.brand_id.name)
+        session.add(brand)
+        await session.flush()
+        address_brand = data_car.brand_id.address
+        address = Address(
+            country=address_brand.country,
+            city=address_brand.city,
+            street=address_brand.street,
+            house=address_brand.house,
+            brand_id=brand.id,
+        )
+        session.add(address)
+        await session.flush()
+
+    car = Car(
+        name=data_car.name,
+        color=data_car.color,
+        price=data_car.price,
+        brand_id=brand.id,
+    )
+    session.add(car)
+    await session.commit()
+    stmt = (
+        select(Car)
+        .options(selectinload(Car.brand).selectinload(Brand.addresses))
+        .where(Car.id == car.id)
+    )
+    result_new = await session.scalars(stmt)
+    car = result_new.first()
+    await session.refresh(car)
+    return car
 
 
 async def get_cars(
     session: AsyncSession,
 ) -> list[Car]:
-    stmt = select(Car).options(selectinload(Car.brand_name)).order_by(Car.id)
+    stmt = select(Car).order_by(Car.id)
     result = await session.scalars(stmt)
     cars = result.all()
     return list(cars)

@@ -1,15 +1,13 @@
 __all__ = (
     "Base",
     "db_helper",
-    "Address",
-    "AddressBrands",
-    "Brand",
     "Car",
+    "Brand",
+    "Address",
 )
 
 from .base import Base
 from .helper_database import db_helper
-from .address import Address
-from .address_brands import AddressBrands
-from .brand_car import Brand
 from .car import Car
+from .address import Address
+from .brand_car import Brand

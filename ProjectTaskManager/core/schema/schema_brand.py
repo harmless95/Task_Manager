@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
@@ -15,7 +15,7 @@ class BrandCreate(BaseModel):
 class BrandRead(BaseModel):
     id: UUID
     name: str
-    address: Optional["AddressRead"]
+    addresses: Optional[List[AddressRead]]
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -9,7 +9,7 @@ class CarCreate(BaseModel):
     name: str
     color: str
     price: int
-    brand_name: Optional["BrandCreate"]
+    brand_id: Optional["BrandCreate"]
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -19,7 +19,7 @@ class CarRead(BaseModel):
     name: str
     color: str
     price: int
-    brand_name: Optional["BrandRead"]
+    brand: BrandRead
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -28,6 +28,6 @@ class CarUpdate(BaseModel):
     name: str | None = None
     color: str | None = None
     price: int | None = None
-    brand_name: Optional["BrandUpdate"] | None = None
+    brand_id: Optional["BrandUpdate"] | None = None
 
     model_config = ConfigDict(from_attributes=True)

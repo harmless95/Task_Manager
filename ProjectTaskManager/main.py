@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import logging
 from contextlib import asynccontextmanager
 
@@ -9,7 +10,7 @@ from core.model import db_helper
 from api.routers import all_routers
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.WARNING,
     format=setting.logging.log_format,
 )
 

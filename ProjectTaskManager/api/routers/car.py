@@ -3,15 +3,28 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.CRUD.crud_car import get_cars, get_car, update_car
+from api.CRUD.crud_car import get_cars, get_car, update_car, create_car
 from core.config import setting
 from core.model import db_helper, Car
-from core.schema.schema_car import CarRead, CarUpdate
+from core.schema.schema_car import CarRead, CarUpdate, CarCreate
 
 router = APIRouter(
     prefix=setting.api.v1.car,
     tags=[setting.api.v1.car_tag],
 )
+
+
+@router.post(
+    "/",
+    response_model=CarRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_new_car(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    data_car: CarCreate,
+) -> Car:
+    car = await create_car(session=session, data_car=data_car)
+    return car
 
 
 @router.get(

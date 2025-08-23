@@ -15,7 +15,7 @@ class Car(Base, KeyUUID):
     name: Mapped[str] = mapped_column(String(100), unique=True)
     color: Mapped[str] = mapped_column(String(100))
     price: Mapped[int] = mapped_column()
-    brand_name: Mapped[UUID] = mapped_column(
+    brand_id: Mapped[UUID] = mapped_column(
         UUID_PG(as_uuid=True), ForeignKey("brands.id")
     )
 
